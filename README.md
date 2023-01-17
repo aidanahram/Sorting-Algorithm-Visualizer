@@ -8,5 +8,6 @@ To run in debug mode:
 Add more algorithms:
 - [x] Selection Sort
 - [x] Insertion Sort
+- [ ] Heap Sort
 - [ ] Merge Sort
 - [ ] Bubble Sort
