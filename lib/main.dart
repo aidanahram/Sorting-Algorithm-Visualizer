@@ -13,8 +13,13 @@ List<int> redValues = <int>[];
 List<int> greenValues = <int>[];
 
 bool running = false;
+
 void main() {
-  const int sizeOfValues = 100; //SETS THE NUMBER OF ITEMS IN THE LIST
+  
+  /// Sets the numer of items in the list
+  /// 
+  /// Can be modified to have more of less values
+  const int sizeOfValues = 10; 
   for(int i = 1; i < sizeOfValues + 1; i++){
     values.add(i);
   } 
@@ -31,15 +36,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sorting Algorithms Visualizer',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.green,
       ),
       home: const MyHomePage(title: 'Sorting Algorithms Visualizer'),
@@ -49,16 +45,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+  
   final String title;
 
   @override
@@ -70,38 +57,15 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     int timeOut = 1;
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Center(
           child: Text(widget.title),
         ),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -117,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.deepPurpleAccent,
                   ),
                   onChanged: (String? value) {
-                    // This is called when the user selects an item.
+                    /// This is called when the user selects an item.
                     setState(() {
                       algorithm = value!;
                     });
@@ -145,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.deepPurpleAccent,
                   ),
                   onChanged: (String? value) {
-                    // This is called when the user selects an item.
+                    /// This is called when the user selects an item.
                     setState(() {
                       speed = value!;
                     });
@@ -159,10 +123,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ]
             ),
+            /// Row for the three buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(  
+                ElevatedButton( 
+                  child: const Text("Scramble", style: TextStyle(fontSize: 20),),   
                   onPressed: () {
                     setState(() {
                       running = false;
@@ -170,20 +136,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       reset();
                     });
                   },  
-                  child: const Text("Scramble", style: TextStyle(fontSize: 20),),  
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(  
+                  child: const Text("Stop", style: TextStyle(fontSize: 20),),  
                   onPressed: () {
                     setState(() {
                       running = false;
                       reset();
                     });
                   },  
-                  child: const Text("Stop", style: TextStyle(fontSize: 20),),  
                 ),
                 const SizedBox(width: 10),
+
+                /// Sort Button
+                /// 
+                /// Contains all the logic for the sorting algorithms
                 ElevatedButton(  
+                  child: const Text("Sort", style: TextStyle(fontSize: 20),), 
                   onPressed: () async {
                     reset();
                     if(running){
@@ -192,12 +162,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       running = true;
                     }
                     switch(speed){
-                      case 'Slow': { timeOut = 1000; } break;
-                      case 'Medium': { timeOut = 2; } break;
-                      case 'Fast': { timeOut = 0; } break;
+                      case "Slow": { timeOut = 1000; } break;
+                      case "Medium": { timeOut = 2; } break;
+                      case "Fast": { timeOut = 0; } break;
                     }
                     switch(algorithm){
-                      case 'Selection Sort': {
+                      case "Selection Sort": {
                         int minValIndex;
                         for(int i = 0; i < values.length; i++){
                           minValIndex = i;
@@ -207,9 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           await Future.delayed(Duration(milliseconds: timeOut));
 
                           for(int j = i + 1; j < values.length; j++){
-                            if(!running){
-                              return;
-                            }
+                            if(!running) return;
                             setState(() {
                               //current
                               redValues = [j];
@@ -224,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               await Future.delayed(Duration(milliseconds: timeOut));
                             }                    
                           }
-                          //swap values[i] and values[minValIndex]
+                          // swap values[i] and values[minValIndex]
                           setState(() {
                             int temp = values[i];
                             values[i] = values[minValIndex];
@@ -234,13 +202,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           await Future.delayed(Duration(milliseconds: timeOut));
                         }
                         setState(() {
-                          redValues = [];
-                          yellowValues = [];
+                          running = false;
+                          redValues.clear();
+                          yellowValues.clear();
                         });
-                        running = false;
                       } break;
 
-                      case 'Insertion Sort': {
+                      case "Insertion Sort": {
                         for(int i = 0; i < values.length; i++){
                           int curr = values[i];
                           int j = i - 1;
@@ -253,9 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           //check if the one before curr is greater, if it is we need to swap
                           while (j >= 0 && curr < values[j]) {
-                            if(!running){
-                              return;
-                            }
+                            if(!running) return;
                             setState(() {
                               redValues = [j+1];
                               yellowValues = [j];
@@ -271,22 +237,83 @@ class _MyHomePageState extends State<MyHomePage> {
                               yellowValues = [j+1];
                             });
                             await Future.delayed(Duration(milliseconds: timeOut));
-                            j -= 1;
+                            j--;
                           }
                           values[j + 1] = curr;
                           setState(() {
                             greenValues.add(i);
                           });
                         }
-                        running = false;
                         setState(() {
-                          redValues = [];
-                          yellowValues = [];
+                          running = false;
+                          redValues.clear();
+                          yellowValues.clear();
                         });
+                      } break;
+
+                      case "Merge Sort": {
+                        List<int> merge(final List<int> leftArray, final List<int> rightArray){
+                          if(!running) return <int>[];
+                          List<int> res = [];
+                          int i = 0, j = 0;
+                          while(i < leftArray.length && j < rightArray.length){
+                            if(leftArray[i] < rightArray[j]){
+                              res.add(leftArray[i]);
+                              i++;
+                            } else {
+                              res.add(rightArray[j]);
+                              j++;
+                            }
+                          }
+
+                          while(i < leftArray.length){
+                            res.add(leftArray[i]);
+                            i++;
+                          }
+
+                          while(j < rightArray.length){
+                            res.add(rightArray[j]);
+                            j++;
+                          }
+
+                          return res;
+                        }
+
+                        Future<List<int>> mergeSort(List<int> values) async{
+                          print(values);
+                          if(!running) return <int>[];
+                          if(values.length <= 1) return values;
+                          
+                          int middleIndex = (values.length / 2).floor();
+                          setState(() {
+                            yellowValues = [for(var i=0; i<middleIndex; i++) i];
+                            redValues = [for(var i=middleIndex; i<values.length; i++) i];
+                          });
+                          await Future.delayed(Duration(milliseconds: timeOut));
+                          // Sort the left half
+                          List<int> leftArray = await mergeSort(values.sublist(0, middleIndex));
+                          // Sort the right half
+                          List<int> rightArray = await mergeSort(values.sublist(middleIndex, values.length));
+                          // MERGE BABY MERGE!
+
+                          return merge(leftArray, rightArray);
+                        }
+
+                        //Call the merge sort function
+                        final newValues = await mergeSort(values);
+                        setState(() {
+                          running = false;
+                          if(newValues.isNotEmpty){
+                            values = newValues;
+                            greenValues = [for(var i=0; i<values.length; i++) i];
+                          }
+                          yellowValues.clear();
+                          redValues.clear();
+                        });
+                        print(values);
                       } break;
                     }
                   },  
-                  child: const Text("Sort", style: TextStyle(fontSize: 20),),  
                 ),
               ],
             ),
@@ -306,7 +333,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black),
                         color: getColor(i),
-                        
                       ),
                     ),
                   ),
@@ -321,12 +347,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Color getColor(int index){
-  if(yellowValues.contains(index)){
+/// Return [Color] for a given value
+/// 
+/// Blue = default, Green = sorted, Red and Yellow are used in sorting operations
+Color getColor(int value){
+  if(yellowValues.contains(value)){
     return Colors.yellow;
-  }else if(redValues.contains(index)){
+  }else if(redValues.contains(value)){
     return Colors.red;
-  }else if(greenValues.contains(index)){
+  }else if(greenValues.contains(value)){
     return Colors.green;
   }else{
     return Colors.blue;
@@ -334,7 +363,8 @@ Color getColor(int index){
 }
 
 void reset(){
-  redValues = [];
-  yellowValues = [];
-  greenValues = [];
+  redValues.clear();
+  yellowValues.clear();
+  greenValues.clear();
 }
+
