@@ -19,7 +19,7 @@ void main() {
   /// Sets the numer of items in the list
   /// 
   /// Can be modified to have more of less values
-  const int sizeOfValues = 10; 
+  const int sizeOfValues = 100; 
   for(int i = 1; i < sizeOfValues + 1; i++){
     values.add(i);
   } 
@@ -163,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
                     switch(speed){
                       case "Slow": { timeOut = 1000; } break;
-                      case "Medium": { timeOut = 2; } break;
+                      case "Medium": { timeOut = 20; } break;
                       case "Fast": { timeOut = 0; } break;
                     }
                     switch(algorithm){
@@ -252,65 +252,76 @@ class _MyHomePageState extends State<MyHomePage> {
                       } break;
 
                       case "Merge Sort": {
-                        List<int> merge(final List<int> leftArray, final List<int> rightArray){
-                          if(!running) return <int>[];
-                          List<int> res = [];
-                          int i = 0, j = 0;
+                        Future<List<int>> merge(final List<int> values, int leftIndex, int middleIndex, int rightIndex) async{
+                          if(!running) values;
+                          List<int> leftArray = values.sublist(leftIndex, middleIndex + 1); // [leftIndex, middleIndex]
+                          List<int> rightArray = values.sublist(middleIndex + 1, rightIndex + 1); // (middleIndex, rightIndex]
+                          setState(() {
+                            yellowValues = [for(int i = leftIndex; i <= middleIndex; i++) i];
+                            redValues = [for(int i = middleIndex + 1; i <= rightIndex; i++) i];
+                          });
+                          await Future.delayed(Duration(milliseconds: timeOut));
+                          int i = 0, j = 0; //index of left array, index of right array
+                          int indexOfMergedArray = leftIndex;
                           while(i < leftArray.length && j < rightArray.length){
                             if(leftArray[i] < rightArray[j]){
-                              res.add(leftArray[i]);
+                              values[indexOfMergedArray] = leftArray[i];
                               i++;
                             } else {
-                              res.add(rightArray[j]);
+                              values[indexOfMergedArray] = rightArray[j];
                               j++;
                             }
+                            indexOfMergedArray++;
                           }
 
                           while(i < leftArray.length){
-                            res.add(leftArray[i]);
+                            values[indexOfMergedArray] = leftArray[i];
                             i++;
+                            indexOfMergedArray++;
                           }
 
                           while(j < rightArray.length){
-                            res.add(rightArray[j]);
+                            values[indexOfMergedArray] = rightArray[j];
                             j++;
+                            indexOfMergedArray++;
                           }
 
-                          return res;
+                          setState(() {
+                            
+                          });
+                          await Future.delayed(Duration(milliseconds: timeOut));
+                          return values;
                         }
 
-                        Future<List<int>> mergeSort(List<int> values) async{
-                          print(values);
-                          if(!running) return <int>[];
-                          if(values.length <= 1) return values;
+                        Future<List<int>> mergeSort(List<int> values, int leftIndex, int rightIndex) async{
+                          if(!running) return values;
+                          if(leftIndex >= rightIndex) return values;
                           
-                          int middleIndex = (values.length / 2).floor();
+                          int middleIndex = leftIndex + ((rightIndex - leftIndex) / 2).floor();
                           setState(() {
-                            yellowValues = [for(var i=0; i<middleIndex; i++) i];
-                            redValues = [for(var i=middleIndex; i<values.length; i++) i];
+                            yellowValues = [for(int i = leftIndex; i <= middleIndex; i++) i];
+                            redValues = [for(int i = middleIndex + 1; i <= rightIndex; i++) i];
                           });
                           await Future.delayed(Duration(milliseconds: timeOut));
                           // Sort the left half
-                          List<int> leftArray = await mergeSort(values.sublist(0, middleIndex));
+                          values = await mergeSort(values, leftIndex, middleIndex);
                           // Sort the right half
-                          List<int> rightArray = await mergeSort(values.sublist(middleIndex, values.length));
+                          values = await mergeSort(values, middleIndex + 1, rightIndex);
                           // MERGE BABY MERGE!
-
-                          return merge(leftArray, rightArray);
+                          values = await merge(values, leftIndex, middleIndex, rightIndex);
+                          return values;
                         }
 
                         //Call the merge sort function
-                        final newValues = await mergeSort(values);
-                        setState(() {
-                          running = false;
-                          if(newValues.isNotEmpty){
-                            values = newValues;
+                        values = await mergeSort(values, 0, values.length - 1);
+                        if(running){
+                          setState(() {
+                            running = false;
                             greenValues = [for(var i=0; i<values.length; i++) i];
-                          }
-                          yellowValues.clear();
-                          redValues.clear();
-                        });
-                        print(values);
+                            yellowValues.clear();
+                            redValues.clear();
+                          });
+                        }
                       } break;
                     }
                   },  
