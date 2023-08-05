@@ -4,11 +4,11 @@ A Flutter project to examine what sorting algorithms are doing.
 To run in debug mode:
   flutter run -d [device]
 
-## TODO
-Add more algorithms:
+Algorithms included:
 - [x] Selection Sort
 - [x] Insertion Sort
-- [ ] Heap Sort
 - [x] Merge Sort
 - [x] Bubble Sort
-- [ ] Quick Sort
+- [x] Quick Sort
+
+

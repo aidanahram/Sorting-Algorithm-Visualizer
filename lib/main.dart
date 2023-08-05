@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const List<String> algorithms = <String>['Selection Sort', 'Insertion Sort', 'Bubble Sort', 'Merge Sort'];
+const List<String> algorithms = <String>['Selection Sort', 'Insertion Sort', 'Bubble Sort', 'Merge Sort', "Quick Sort"];
 const List<String> speeds = <String>['Slow', 'Medium', 'Fast'];
 List<int> values = <int>[];
 
@@ -11,6 +11,8 @@ int heightMultiplier = 1;
 List<int> yellowValues = <int>[]; 
 List<int> redValues = <int>[];
 List<int> greenValues = <int>[];
+List<int> purpleValues = <int>[];
+List<int> orangeValues = <int>[];
 
 bool running = false;
 
@@ -301,6 +303,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           int i = 0, j = 0; //index of left array, index of right array
                           int indexOfMergedArray = leftIndex;
                           while(i < leftArray.length && j < rightArray.length){
+                            if(!running) values;
                             if(leftArray[i] < rightArray[j]){
                               values[indexOfMergedArray] = leftArray[i];
                               i++;
@@ -312,20 +315,20 @@ class _MyHomePageState extends State<MyHomePage> {
                           }
 
                           while(i < leftArray.length){
+                            if(!running) values;
                             values[indexOfMergedArray] = leftArray[i];
                             i++;
                             indexOfMergedArray++;
                           }
 
                           while(j < rightArray.length){
+                            if(!running) values;
                             values[indexOfMergedArray] = rightArray[j];
                             j++;
                             indexOfMergedArray++;
                           }
 
-                          setState(() {
-                            
-                          });
+                          setState(() {});
                           await Future.delayed(Duration(milliseconds: timeOut));
                           return values;
                         }
@@ -342,8 +345,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           await Future.delayed(Duration(milliseconds: timeOut));
                           // Sort the left half
                           values = await mergeSort(values, leftIndex, middleIndex);
+                          if(!running) return values;
                           // Sort the right half
                           values = await mergeSort(values, middleIndex + 1, rightIndex);
+                          if(!running) return values;
                           // MERGE BABY MERGE!
                           values = await merge(values, leftIndex, middleIndex, rightIndex);
                           return values;
@@ -356,11 +361,75 @@ class _MyHomePageState extends State<MyHomePage> {
                             running = false;
                             greenValues = values.toList();
                             greenValues.add(0);
-                            yellowValues.clear();
-                            redValues.clear();
                           });
                         }
                       } break;
+
+                      case "Quick Sort": {
+                        Future<List<int>> quickSort(List<int> values, int leftIndex, int rightIndex) async{
+                          if(!running) return values;
+                          int partitionIndex;
+                          int pivot; 
+                          int j;
+                          int temp;
+                          if(leftIndex < rightIndex){
+                            // PARTITION FUNCTION
+                            pivot = values[rightIndex];
+                            partitionIndex = leftIndex - 1;
+                            setState(() {
+                              yellowValues = [for(int i = leftIndex; i < rightIndex; i++) i];
+                              purpleValues = [rightIndex];
+                              redValues = [];
+                            });
+                            await Future.delayed(Duration(milliseconds: timeOut));
+
+                            // go from left to right, count how many are smaller than the pivot element
+                            // I
+                            for(j = leftIndex; j <= rightIndex; j++){
+                              if(!running) return values;
+                              if(values[j] < pivot){
+                                partitionIndex++;
+                                // swap (values[partitionIndex], values[j])
+                                temp = values[j];
+                                values[j] = values[partitionIndex];
+                                values[partitionIndex] = temp;
+                                setState(() {
+                                  yellowValues.remove(partitionIndex);
+                                  redValues.add(partitionIndex);
+                                });
+                                await Future.delayed(Duration(milliseconds: (timeOut ~/ 2)));
+                              }
+                            }
+                            // swap (values[partitionIndex + 1], values[rightIndex])
+                            // move the pivot element into the right position in [leftIndex, rightIndex]
+                            partitionIndex++;
+                            temp = values[partitionIndex];
+                            values[partitionIndex] = values[rightIndex];
+                            values[rightIndex] = temp;
+                            // END OF PARTITION FUNCTION
+
+                            setState(() {
+                              purpleValues = [partitionIndex];
+                              yellowValues = [for(int i = leftIndex; i < partitionIndex; i++) i];
+                              redValues = [for(int i = partitionIndex + 1; i <= rightIndex; i++) i];
+                            });
+                            await Future.delayed(Duration(milliseconds: timeOut));
+
+                            //sort the left
+                            values = await quickSort(values, leftIndex, partitionIndex - 1);
+                            // sort the right
+                            values = await quickSort(values, partitionIndex + 1, rightIndex);
+                          }
+                          return values;
+                        }
+                        values = await quickSort(values, 0, values.length - 1);
+                        if(running){
+                          setState(() {
+                            greenValues = values.toList();
+                            greenValues.add(0);
+                          });
+                        }
+                      }
                     }
                   },  
                 ),
@@ -400,12 +469,16 @@ class _MyHomePageState extends State<MyHomePage> {
 /// 
 /// Blue = default, Green = sorted, Red and Yellow are used in sorting operations
 Color getColor(int value){
-  if(yellowValues.contains(value)){
-    return Colors.yellow;
+  if(greenValues.contains(value)){
+    return Colors.green;
   }else if(redValues.contains(value)){
     return Colors.red;
-  }else if(greenValues.contains(value)){
-    return Colors.green;
+  }else if(purpleValues.contains(value)){
+    return Colors.purple;
+  }else if(yellowValues.contains(value)){
+    return Colors.yellow;
+  }else if(orangeValues.contains(value)){
+    return Colors.orange;
   }else{
     return Colors.blue;
   }
@@ -415,5 +488,7 @@ void reset(){
   redValues.clear();
   yellowValues.clear();
   greenValues.clear();
+  purpleValues.clear();
+  orangeValues.clear();
 }
 
