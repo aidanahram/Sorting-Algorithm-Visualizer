@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const List<String> algorithms = <String>['Selection Sort', 'Insertion Sort', 'Merge Sort', 'Bubble Sort'];
+const List<String> algorithms = <String>['Selection Sort', 'Insertion Sort', 'Bubble Sort', 'Merge Sort'];
 const List<String> speeds = <String>['Slow', 'Medium', 'Fast'];
 List<int> values = <int>[];
 
@@ -170,6 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       case "Selection Sort": {
                         int minValIndex;
                         for(int i = 0; i < values.length; i++){
+                          if(!running) return;
                           minValIndex = i;
                           setState(() {
                             yellowValues = [minValIndex];
@@ -251,6 +252,42 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       } break;
 
+                      case "Bubble Sort": {
+                        int i, j;
+                        int temp;
+                        bool swapped;
+                        for(i = 0; i < values.length; i++){
+                          swapped = false;
+                          for(j = 0; j < values.length - i - 1; j++){
+                            if(!running) return;
+                            setState(() {
+                              yellowValues = [j];
+                              redValues = [j+1];
+                            });
+                            await Future.delayed(Duration(milliseconds: timeOut));
+                            if(values[j] > values[j+1]){  // if value on left is less than value on right swap them
+                              temp = values[j+1];
+                              values[j+1] = values[j];
+                              values[j] = temp;
+                              swapped = true;
+                              setState(() {
+                                // values have swapped
+                                yellowValues = [j+1];
+                                redValues = [j];
+                              });
+                              await Future.delayed(Duration(milliseconds: timeOut));
+                            }
+                          }
+                          if(!swapped) break;
+                        }
+                        setState(() {
+                          greenValues = values.toList();
+                          greenValues.add(0);
+                          yellowValues.clear();
+                          redValues.clear();
+                        });
+                      } break;
+
                       case "Merge Sort": {
                         Future<List<int>> merge(final List<int> values, int leftIndex, int middleIndex, int rightIndex) async{
                           if(!running) values;
@@ -317,7 +354,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         if(running){
                           setState(() {
                             running = false;
-                            greenValues = [for(var i=0; i<values.length; i++) i];
+                            greenValues = values.toList();
+                            greenValues.add(0);
                             yellowValues.clear();
                             redValues.clear();
                           });
