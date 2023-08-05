@@ -10,4 +10,5 @@ Add more algorithms:
 - [x] Insertion Sort
 - [ ] Heap Sort
 - [x] Merge Sort
-- [ ] Bubble Sort
+- [x] Bubble Sort
+- [ ] Quick Sort
