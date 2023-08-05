@@ -9,5 +9,5 @@ Add more algorithms:
 - [x] Selection Sort
 - [x] Insertion Sort
 - [ ] Heap Sort
-- [ ] Merge Sort
+- [x] Merge Sort
 - [ ] Bubble Sort
