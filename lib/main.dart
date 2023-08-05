@@ -429,7 +429,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             greenValues.add(0);
                           });
                         }
-                      }
+                      } break;
                     }
                   },  
                 ),
