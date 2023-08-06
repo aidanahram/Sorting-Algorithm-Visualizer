@@ -1,31 +1,35 @@
+// ignore_for_file: constant_identifier_names
+
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
-const List<String> algorithms = <String>['Selection Sort', 'Insertion Sort', 'Bubble Sort', 'Merge Sort', "Quick Sort"];
+const List<String> algorithms = <String>['Selection Sort', 'Insertion Sort', 'Bubble Sort', 'Merge Sort', "Quick Sort", "Tim Sort"];
 const List<String> speeds = <String>['Slow', 'Medium', 'Fast'];
-List<int> values = <int>[];
+
 
 String algorithm = algorithms.first;
 String speed = speeds.first;
 
-int heightMultiplier = 1;
 List<int> yellowValues = <int>[]; 
 List<int> redValues = <int>[];
 List<int> greenValues = <int>[];
 List<int> purpleValues = <int>[];
 List<int> orangeValues = <int>[];
 
+/// constant variable used for Tim Sort Algorithm
+const int RUN = 32;
+
 bool running = false;
 
+/// Hold number of values to sort
+/// 
+/// default is 100
+double sizeOfValues = 100; 
+List<int> values = [for(int i = 1; i < sizeOfValues + 1; i++) i]; 
+int heightMultiplier = (600/sizeOfValues).floor();
+
 void main() {
-  
-  /// Sets the numer of items in the list
-  /// 
-  /// Can be modified to have more of less values
-  const int sizeOfValues = 100; 
-  for(int i = 1; i < sizeOfValues + 1; i++){
-    values.add(i);
-  } 
-  heightMultiplier = (600/sizeOfValues).floor();
   runApp(const MyApp());
 }
 
@@ -69,6 +73,27 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Select number of values"),
+                Slider(
+                  value: sizeOfValues,
+                  max: 400,
+                  min: 10,
+                  label: sizeOfValues.floor().toString(),
+                  onChanged: (double value) {
+                    setState(() {
+                      reset();
+                      sizeOfValues = value;
+                      values = [for(int i = 1; i < sizeOfValues + 1; i++) i]; 
+                      heightMultiplier = (600/sizeOfValues).floor();
+                    });
+                  },
+                ),
+                Text("${sizeOfValues.floor()}"),
+              ]
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -166,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     switch(speed){
                       case "Slow": { timeOut = 1000; } break;
                       case "Medium": { timeOut = 20; } break;
-                      case "Fast": { timeOut = 0; } break;
+                      case "Fast": { timeOut = 1; } break;
                     }
                     switch(algorithm){
                       case "Selection Sort": {
@@ -213,10 +238,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       case "Insertion Sort": {
                         for(int i = 0; i < values.length; i++){
+                          if(!running) return;
                           int curr = values[i];
                           int j = i - 1;
 
                           setState(() {
+                            // red is curr, yellow is the one before
                             redValues = [i];
                             yellowValues = [j];
                           });
@@ -225,26 +252,23 @@ class _MyHomePageState extends State<MyHomePage> {
                           //check if the one before curr is greater, if it is we need to swap
                           while (j >= 0 && curr < values[j]) {
                             if(!running) return;
-                            setState(() {
-                              redValues = [j+1];
-                              yellowValues = [j];
-                            });
-                            await Future.delayed(Duration(milliseconds: timeOut));
-
+                            //swap values[j], values[]
                             int temp = values[j];
                             values[j] = curr;
                             values[j + 1] = temp;
-                            
+
                             setState(() {
+                              greenValues.remove(j);
+                              greenValues.add(j+1);
                               redValues = [j];
-                              yellowValues = [j+1];
+                              yellowValues = [j-1];
                             });
                             await Future.delayed(Duration(milliseconds: timeOut));
                             j--;
                           }
                           values[j + 1] = curr;
                           setState(() {
-                            greenValues.add(i);
+                            greenValues.add(j+1);
                           });
                         }
                         setState(() {
@@ -266,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               yellowValues = [j];
                               redValues = [j+1];
                             });
-                            await Future.delayed(Duration(milliseconds: timeOut));
+                            await Future.delayed(Duration(milliseconds: timeOut ~/ 2));
                             if(values[j] > values[j+1]){  // if value on left is less than value on right swap them
                               temp = values[j+1];
                               values[j+1] = values[j];
@@ -292,7 +316,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       case "Merge Sort": {
                         Future<List<int>> merge(final List<int> values, int leftIndex, int middleIndex, int rightIndex) async{
-                          if(!running) values;
+                          if(!running) return values;
                           List<int> leftArray = values.sublist(leftIndex, middleIndex + 1); // [leftIndex, middleIndex]
                           List<int> rightArray = values.sublist(middleIndex + 1, rightIndex + 1); // (middleIndex, rightIndex]
                           setState(() {
@@ -303,7 +327,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           int i = 0, j = 0; //index of left array, index of right array
                           int indexOfMergedArray = leftIndex;
                           while(i < leftArray.length && j < rightArray.length){
-                            if(!running) values;
+                            if(!running) return values;
                             if(leftArray[i] < rightArray[j]){
                               values[indexOfMergedArray] = leftArray[i];
                               i++;
@@ -315,14 +339,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           }
 
                           while(i < leftArray.length){
-                            if(!running) values;
+                            if(!running) return values;
                             values[indexOfMergedArray] = leftArray[i];
                             i++;
                             indexOfMergedArray++;
                           }
 
                           while(j < rightArray.length){
-                            if(!running) values;
+                            if(!running) return values;
                             values[indexOfMergedArray] = rightArray[j];
                             j++;
                             indexOfMergedArray++;
@@ -332,6 +356,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           await Future.delayed(Duration(milliseconds: timeOut));
                           return values;
                         }
+                        
 
                         Future<List<int>> mergeSort(List<int> values, int leftIndex, int rightIndex) async{
                           if(!running) return values;
@@ -425,11 +450,116 @@ class _MyHomePageState extends State<MyHomePage> {
                         values = await quickSort(values, 0, values.length - 1);
                         if(running){
                           setState(() {
-                            greenValues = values.toList();
-                            greenValues.add(0);
+                          greenValues = values.toList();
+                          greenValues.add(0);
                           });
                         }
                       } break;
+                      
+                      case "Tim Sort": {
+                        Future<List<int>> insertionSort(List<int> values, int leftIndex, int rightIndex) async{
+                          for(int i = leftIndex + 1; i <= rightIndex; i++){
+                            int curr = values[i];
+                            int j = i - 1;
+
+                            setState(() {
+                              redValues = [i];
+                              yellowValues = [j];
+                            });
+                            await Future.delayed(Duration(milliseconds: timeOut));
+
+                            //check if the one before curr is greater, if it is we need to swap
+                            while (j >= leftIndex && curr < values[j]) {
+                              if(!running) return values;
+                              setState(() {
+                                redValues = [j+1];
+                                yellowValues = [j];
+                              });
+                              await Future.delayed(Duration(milliseconds: timeOut));
+
+                              int temp = values[j];
+                              values[j] = curr;
+                              values[j + 1] = temp;
+                              
+                              setState(() {
+                                redValues = [j];
+                                yellowValues = [j+1];
+                              });
+                              await Future.delayed(Duration(milliseconds: timeOut));
+                              j--;
+                            }
+                            values[j + 1] = curr;
+                          }
+                          return values;
+                        }
+
+                        Future<List<int>> merge(final List<int> values, int leftIndex, int middleIndex, int rightIndex) async{
+                          if(!running) return values;
+                          List<int> leftArray = values.sublist(leftIndex, middleIndex + 1); // [leftIndex, middleIndex]
+                          List<int> rightArray = values.sublist(middleIndex + 1, rightIndex + 1); // (middleIndex, rightIndex]
+                          setState(() {
+                            yellowValues = [for(int i = leftIndex; i <= middleIndex; i++) i];
+                            redValues = [for(int i = middleIndex + 1; i <= rightIndex; i++) i];
+                          });
+                          await Future.delayed(Duration(milliseconds: timeOut * 5));
+                          int i = 0, j = 0; //index of left array, index of right array
+                          int indexOfMergedArray = leftIndex;
+                          while(i < leftArray.length && j < rightArray.length){
+                            if(!running) return values;
+                            if(leftArray[i] < rightArray[j]){
+                              values[indexOfMergedArray] = leftArray[i];
+                              i++;
+                            } else {
+                              values[indexOfMergedArray] = rightArray[j];
+                              j++;
+                            }
+                            indexOfMergedArray++;
+                          }
+
+                          while(i < leftArray.length){
+                            if(!running) return values;
+                            values[indexOfMergedArray] = leftArray[i];
+                            i++;
+                            indexOfMergedArray++;
+                          }
+
+                          while(j < rightArray.length){
+                            if(!running) return values;
+                            values[indexOfMergedArray] = rightArray[j];
+                            j++;
+                            indexOfMergedArray++;
+                          }
+
+                          setState(() {});
+                          await Future.delayed(Duration(milliseconds: timeOut * 5));
+                          return values;
+                        }
+
+                        /// TIM SORT ALGORITHM
+                        for(int i = 0; i < values.length; i += RUN){
+                          if(!running) return;
+                          values = await insertionSort(values, i, min((i + RUN - 1), (values.length - 1)));
+                        }
+
+                        setState(() {});
+                        await Future.delayed(Duration(milliseconds: timeOut));
+                        // Start merging
+                        for(int size = RUN; size < values.length; size *= 2){
+                            for(int leftIndex = 0; leftIndex < values.length; leftIndex += 2 * size){
+                              if(!running) return;
+                              int middleIndex = leftIndex + size - 1;
+                              int rightIndex = min((leftIndex + (2 * size) - 1), (values.length - 1));
+                              if(middleIndex < rightIndex){
+                                values = await merge(values, leftIndex, middleIndex, rightIndex);
+                              }
+                            }
+                        }
+                        setState(() {
+                          reset();
+                          greenValues = values.toList();
+                          greenValues.add(0);
+                        });
+                      }
                     }
                   },  
                 ),
@@ -485,6 +615,7 @@ Color getColor(int value){
 }
 
 void reset(){
+  running = false;
   redValues.clear();
   yellowValues.clear();
   greenValues.clear();
